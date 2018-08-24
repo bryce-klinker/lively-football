@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using Lively.Football.Application.Common;
 using Lively.Football.Application.Common.FootballApi;
 using Lively.Football.Application.Countries.Entities;
+using Lively.Football.Application.Countries.Models;
 using Lively.Football.Application.Countries.Transformers;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lively.Football.Application.Countries
 {
@@ -35,6 +37,14 @@ namespace Lively.Football.Application.Countries
             await _storage.Save();
         }
 
+        public async Task<CountryModel[]> GetAll()
+        {
+            return await _storage.GetAll<Country>()
+                .Select(c => new CountryModel {Id = c.Id, Name = c.Name})
+                .OrderBy(c => c.Name)
+                .ToArrayAsync();
+        }
+
         private async Task AddOrUpdateCountry(Country country)
         {
             var existing = await _storage.GetSingle<Country>(c => c.SourceId == country.SourceId);
@@ -42,6 +52,11 @@ namespace Lively.Football.Application.Countries
                 _storage.Add(country);
             else
                 existing.Name = country.Name;
+        }
+
+        public async Task<CountryModel> GetById(long id)
+        {
+            return (await GetAll()).Single(s => s.Id == id);
         }
     }
 }
