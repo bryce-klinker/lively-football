@@ -1,7 +1,10 @@
-using System.Net;
+using System.Linq;
 using System.Threading.Tasks;
 using Lively.Football.Application.Countries;
+using Lively.Football.Application.Countries.Entities;
 using Lively.Football.Tests.Fakes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace Lively.Football.Tests
@@ -12,9 +15,12 @@ namespace Lively.Football.Tests
         public async Task GivenNoCountries_WhenCountriesAreLoaded_ThenCountriesAreLoadedFromDataSource()
         {
             var config = new FakeDataSourceConfig();
-            var service = new CountriesService(config);
+            var storage = new InMemoryStorage();
+
+            var service = new CountriesService(config, storage);
             var response = await service.LoadAll();
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var countries = JsonConvert.DeserializeObject<JObject[]>(await response.Content.ReadAsStringAsync());
+            Assert.Equal(countries.Length, storage.GetAll<Country>().Count());
         }
     }
 }
