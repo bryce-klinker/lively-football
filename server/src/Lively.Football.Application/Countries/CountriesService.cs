@@ -27,9 +27,13 @@ namespace Lively.Football.Application.Countries
             {
                 var response = await client.GetAsync($"{BaseUrl}?action=get_countries&APIkey={ApiKey}");
                 var content = JsonConvert.DeserializeObject<JObject[]>(await response.Content.ReadAsStringAsync());
-                foreach (var _ in content)
+                foreach (var country in content)
                 {
-                    _storage.Add(new Country());
+                    _storage.Add(new Country
+                    {
+                        SourceId = country.Value<string>("country_id"),
+                        Name = country.Value<string>("country_name")
+                    });
                 }
 
                 await _storage.Save();
