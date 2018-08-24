@@ -3,7 +3,12 @@ using Lively.Football.Application.Countries.Entities;
 
 namespace Lively.Football.Application.Countries.Transformers
 {
-    internal class CountryTransformer
+    internal interface ICountryTransformer
+    {
+        Country ToCountry(FootballApiCountry country);
+    }
+
+    internal class CountryTransformer : ICountryTransformer
     {
         public Country ToCountry(FootballApiCountry country)
         {

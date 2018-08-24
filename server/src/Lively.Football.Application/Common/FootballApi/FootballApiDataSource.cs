@@ -5,7 +5,12 @@ using Newtonsoft.Json;
 
 namespace Lively.Football.Application.Common.FootballApi
 {
-    internal class FootballApiDataSource
+    internal interface IFootballApiDataSource
+    {
+        Task<FootballApiCountry[]> GetCountries();
+    }
+
+    internal class FootballApiDataSource : IFootballApiDataSource
     {
         private readonly IDataSourceConfig _config;
         private readonly IHttpClientFactory _httpClientFactory;

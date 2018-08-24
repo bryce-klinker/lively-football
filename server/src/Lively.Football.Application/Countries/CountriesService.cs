@@ -9,14 +9,19 @@ namespace Lively.Football.Application.Countries
 {
     public class CountriesService
     {
-        private readonly FootballApiDataSource _dataSource;
-        private readonly CountryTransformer _transformer;
+        private readonly IFootballApiDataSource _dataSource;
+        private readonly ICountryTransformer _transformer;
         private readonly IStorage _storage;
 
         public CountriesService(IDataSourceConfig config, IStorage storage, IHttpClientFactory httpFactory)
+            : this(new FootballApiDataSource(config, httpFactory), new CountryTransformer(), storage)
         {
-            _dataSource = new FootballApiDataSource(config, httpFactory);
-            _transformer = new CountryTransformer();
+        }
+
+        internal CountriesService(IFootballApiDataSource dataSource, ICountryTransformer transformer, IStorage storage)
+        {
+            _dataSource = dataSource;
+            _transformer = transformer;
             _storage = storage;
         }
 
