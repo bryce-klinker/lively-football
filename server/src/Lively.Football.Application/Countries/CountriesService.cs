@@ -1,15 +1,26 @@
 using System.Net.Http;
 using System.Threading.Tasks;
+using Lively.Football.Application.Common;
 
 namespace Lively.Football.Application.Countries
 {
     public class CountriesService
     {
+        private readonly IDataSourceConfig _config;
+
+        private string BaseUrl => _config.BaseUrl;
+        private string ApiKey => _config.ApiKey;
+
+        public CountriesService(IDataSourceConfig config)
+        {
+            _config = config;
+        }
+
         public async Task<HttpResponseMessage> LoadAll()
         {
             using (var client = new HttpClient())
             {
-                var response = await client.GetAsync("https://apifootball.com/api/?action=get_countries&APIkey=f0bd2551475a981323ba7a83eeea738e96820b9206e5a6f51503af4d5b375c63");
+                var response = await client.GetAsync($"{BaseUrl}?action=get_countries&APIkey={ApiKey}");
                 return response;
             }
         }

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using Lively.Football.Application.Countries;
+using Lively.Football.Tests.Fakes;
 using Xunit;
 
 namespace Lively.Football.Tests
@@ -10,7 +11,8 @@ namespace Lively.Football.Tests
         [Fact]
         public async Task GivenNoCountries_WhenCountriesAreLoaded_ThenCountriesAreLoadedFromDataSource()
         {
-            var service = new CountriesService();
+            var config = new FakeDataSourceConfig();
+            var service = new CountriesService(config);
             var response = await service.LoadAll();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
