@@ -40,9 +40,16 @@ namespace Lively.Football.Application.Countries
         public async Task<CountryModel[]> GetAll()
         {
             return await _storage.GetAll<Country>()
-                .Select(c => new CountryModel {Id = c.Id, Name = c.Name})
+                .Select(CountryModel.FromCountryExpression())
                 .OrderBy(c => c.Name)
                 .ToArrayAsync();
+        }
+
+        public async Task<CountryModel> GetById(long id)
+        {
+            return await _storage.GetAll<Country>()
+                .Select(CountryModel.FromCountryExpression())
+                .SingleOrDefaultAsync(c => c.Id == id);
         }
 
         private async Task AddOrUpdateCountry(Country country)
@@ -52,11 +59,6 @@ namespace Lively.Football.Application.Countries
                 _storage.Add(country);
             else
                 existing.Name = country.Name;
-        }
-
-        public async Task<CountryModel> GetById(long id)
-        {
-            return (await GetAll()).Single(s => s.Id == id);
         }
     }
 }

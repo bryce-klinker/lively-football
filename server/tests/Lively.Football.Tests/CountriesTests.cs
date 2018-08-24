@@ -93,6 +93,20 @@ namespace Lively.Football.Tests
             Assert.Equal(countries[0].Id, country.Id);
         }
 
+        [Fact]
+        public async Task GivenNoCountries_WhenIGetAllCountries_ThenIShouldSeeNothing()
+        {
+            var countries = await _service.GetAll();
+            Assert.Empty(countries);
+        }
+
+        [Fact]
+        public async Task GivenNoCountries_WhenIGetASingleCountry_ThenIShouldSeeNothing()
+        {
+            var country = await _service.GetById(3423);
+            Assert.Null(country);
+        }
+
         private static void AssertHasCountry(string id, string name, IEnumerable<Country> countries)
         {
             var country = countries.Single(c => c.SourceId == id);
