@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Lively.Football.Application.Countries.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -8,13 +10,10 @@ namespace Lively.Football.Application.Common
 {
     public interface IStorage
     {
-        IQueryable<T> GetAll<T>()
-            where T : class;
-        void Add<T>(T entity)
-            where T : class;
-
-        void Add<T>(IEnumerable<T> entities)
-            where T : class;
+        Task<T> GetSingle<T>(Expression<Func<T, bool>> expression) where T : class;
+        IQueryable<T> GetAll<T>() where T : class;
+        void Add<T>(T entity) where T : class;
+        void Add<T>(IEnumerable<T> entities) where T : class;
         Task Save();
     }
 
@@ -24,6 +23,11 @@ namespace Lively.Football.Application.Common
             : base(options)
         {
 
+        }
+
+        public Task<T> GetSingle<T>(Expression<Func<T, bool>> expression) where T : class
+        {
+            return GetAll<T>().SingleOrDefaultAsync(expression);
         }
 
         public IQueryable<T> GetAll<T>() where T : class

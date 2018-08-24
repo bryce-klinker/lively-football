@@ -1,39 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Lively.Football.Application.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Lively.Football.Tests.Fakes
 {
-    public class InMemoryStorage : IStorage
+    public class InMemoryStorage : Storage
     {
-        private readonly IStorage _storage;
-
         public InMemoryStorage(string name = null)
+            : base(GetOptions(name))
         {
-            _storage = new Storage(GetOptions(name));
-        }
 
-        public IQueryable<T> GetAll<T>() where T : class
-        {
-            return _storage.GetAll<T>();
-        }
-
-        public void Add<T>(T entity) where T : class
-        {
-            _storage.Add(entity);
-        }
-
-        public void Add<T>(IEnumerable<T> entities) where T : class
-        {
-            _storage.Add(entities);
-        }
-
-        public async Task Save()
-        {
-            await _storage.Save();
         }
 
         private static DbContextOptions<Storage> GetOptions(string name)

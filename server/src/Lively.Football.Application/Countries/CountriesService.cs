@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Lively.Football.Application.Common;
 using Lively.Football.Application.Common.FootballApi;
+using Lively.Football.Application.Countries.Entities;
 using Lively.Football.Application.Countries.Transformers;
 
 namespace Lively.Football.Application.Countries
@@ -29,8 +30,18 @@ namespace Lively.Football.Application.Countries
         {
             var sourceCountries = await _dataSource.GetCountries();
             var countries = sourceCountries.Select(_transformer.ToCountry);
-            _storage.Add(countries);
+            foreach (var country in countries)
+                await AddOrUpdateCountry(country);
             await _storage.Save();
+        }
+
+        private async Task AddOrUpdateCountry(Country country)
+        {
+            var existing = await _storage.GetSingle<Country>(c => c.SourceId == country.SourceId);
+            if (existing == null)
+                _storage.Add(country);
+            else
+                existing.Name = country.Name;
         }
     }
 }

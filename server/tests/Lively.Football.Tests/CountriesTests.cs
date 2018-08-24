@@ -41,6 +41,26 @@ namespace Lively.Football.Tests
             AssertHasCountry("34", "Bob", countries);
         }
 
+        [Fact]
+        public async Task GivenExistingCountries_WhenCountriesAreLoaded_ThenCountriesAreUpdatedFromDataSource()
+        {
+            _storage.Add(new Country { Name = "OldUSA", SourceId = "78" });
+            await _storage.Save();
+
+            SetupDataSourceCountries(
+                new {country_id = "456", country_name = "IDK"},
+                new {country_id = "78", country_name = "USA"},
+                new {country_id = "34", country_name = "Bob"}
+            );
+
+            await _service.LoadAll();
+            var countries = _storage.GetAll<Country>().ToArray();
+            Assert.Equal(3, countries.Length);
+            AssertHasCountry("456", "IDK", countries);
+            AssertHasCountry("78", "USA", countries);
+            AssertHasCountry("34", "Bob", countries);
+        }
+
         private static void AssertHasCountry(string id, string name, IEnumerable<Country> countries)
         {
             var country = countries.Single(c => c.SourceId == id);
