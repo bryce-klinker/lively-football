@@ -11,19 +11,21 @@ namespace Lively.Football.Application.Countries
     {
         private readonly IDataSourceConfig _config;
         private readonly IStorage _storage;
+        private readonly IHttpClientFactory _httpFactory;
 
         private string BaseUrl => _config.BaseUrl;
         private string ApiKey => _config.ApiKey;
 
-        public CountriesService(IDataSourceConfig config, IStorage storage)
+        public CountriesService(IDataSourceConfig config, IStorage storage, IHttpClientFactory httpFactory)
         {
             _config = config;
             _storage = storage;
+            _httpFactory = httpFactory;
         }
 
         public async Task<HttpResponseMessage> LoadAll()
         {
-            using (var client = new HttpClient())
+            using (var client = _httpFactory.CreateClient())
             {
                 var response = await client.GetAsync($"{BaseUrl}?action=get_countries&APIkey={ApiKey}");
                 var content = JsonConvert.DeserializeObject<JObject[]>(await response.Content.ReadAsStringAsync());
