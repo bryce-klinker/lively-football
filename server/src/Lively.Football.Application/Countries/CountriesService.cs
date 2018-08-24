@@ -1,7 +1,9 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Lively.Football.Application.Common;
+using Lively.Football.Application.Common.FootballApi;
 using Lively.Football.Application.Countries.Entities;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -9,38 +11,27 @@ namespace Lively.Football.Application.Countries
 {
     public class CountriesService
     {
-        private readonly IDataSourceConfig _config;
+        private readonly FootballApiDataSource _dataSource;
         private readonly IStorage _storage;
-        private readonly IHttpClientFactory _httpFactory;
-
-        private string BaseUrl => _config.BaseUrl;
-        private string ApiKey => _config.ApiKey;
 
         public CountriesService(IDataSourceConfig config, IStorage storage, IHttpClientFactory httpFactory)
         {
-            _config = config;
+            _dataSource = new FootballApiDataSource(config, httpFactory);
             _storage = storage;
-            _httpFactory = httpFactory;
         }
 
-        public async Task<HttpResponseMessage> LoadAll()
+        public async Task LoadAll()
         {
-            using (var client = _httpFactory.CreateClient())
+            var sourceCountries = await _dataSource.GetCountries();
+            foreach (var country in sourceCountries)
             {
-                var response = await client.GetAsync($"{BaseUrl}?action=get_countries&APIkey={ApiKey}");
-                var content = JsonConvert.DeserializeObject<JObject[]>(await response.Content.ReadAsStringAsync());
-                foreach (var country in content)
+                _storage.Add(new Country
                 {
-                    _storage.Add(new Country
-                    {
-                        SourceId = country.Value<string>("country_id"),
-                        Name = country.Value<string>("country_name")
-                    });
-                }
-
-                await _storage.Save();
-                return response;
+                    SourceId = country.Id,
+                    Name = country.Name
+                });
             }
+            await _storage.Save();
         }
     }
 }
