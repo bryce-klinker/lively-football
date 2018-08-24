@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lively.Football.Application.Common;
@@ -23,6 +24,11 @@ namespace Lively.Football.Tests.Fakes
         public void Add<T>(T entity) where T : class
         {
             _storage.Add(entity);
+        }
+
+        public void Add<T>(IEnumerable<T> entities) where T : class
+        {
+            _storage.Add(entities);
         }
 
         public async Task Save()

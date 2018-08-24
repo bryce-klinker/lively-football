@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lively.Football.Application.Countries.Entities;
@@ -10,6 +11,9 @@ namespace Lively.Football.Application.Common
         IQueryable<T> GetAll<T>()
             where T : class;
         void Add<T>(T entity)
+            where T : class;
+
+        void Add<T>(IEnumerable<T> entities)
             where T : class;
         Task Save();
     }
@@ -30,6 +34,12 @@ namespace Lively.Football.Application.Common
         void IStorage.Add<T>(T entity)
         {
             Add(entity);
+        }
+
+        public void Add<T>(IEnumerable<T> entities) where T : class
+        {
+            foreach (var entity in entities)
+                Add(entity);
         }
 
         public async Task Save()
