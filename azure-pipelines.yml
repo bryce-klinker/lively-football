@@ -1,0 +1,33 @@
+name: 'Build $(Build.BuildId)'
+variables:
+  BUILD_CONFIGURATION: 'Release'
+  FUNCTION_OUTPUT_DIRECTORY: '$(Build.SourcesDirectory)/function-app'
+  STAGING_DIRECTORY: '$(Build.ArtifactStagingDirectory)'
+jobs:
+- job: Build
+  pool:
+    vmImage: 'ubuntu-16.04'
+  workspace:
+    clean: all
+  steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'test'
+      configuration: '$(BUILD_CONFIGURATION)'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'publish'
+      arguments: '--output $(FUNCTION_OUTPUT_DIRECTORY)'
+      configuration: '$(BUILD_CONFIGURATION)'
+      publishWebProjects: true
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(FUNCTION_OUTPUT_DIRECTORY)'
+      includeRootFolder: false
+      archiveFile: '$(STAGING_DIRECTORY)/Lively.Football.Function.zip'
+
+  - task: PublishBuildArtifacts@1
+      
+      
